@@ -91,12 +91,8 @@ class lazer
     acceleration(0.04f),
     originPoint(origin),
     scaleFactor(Vector2{target.x - origin.x,target.y - origin.y}),
-    //scaleFactor(Vector2{((target.x / origin.x) -0.5f) * 10,((target.y / origin.y) - 0.5f) * 10}),
-    //scaleFactor(Vector2{(target.x - origin.x),(target.y - origin.y)}),
-    //scaleFactor(Vector2{(target.x - origin.x) / sqrt((target.x - origin.x) + (target.y - origin.y)), (target.y - origin.y) / sqrt(pow((target.x - origin.x),2) + pow((target.y - origin.y),2))}),
     backEnd(origin),
     frontEnd(Vector2{origin.x + scaleFactor.x * 0.40f,origin.y + scaleFactor.y * 0.40f})
-    //frontEnd(Vector2{origin.x + scaleFactor.x * 4.0f,origin.y + scaleFactor.y * 4.0f})
   {
   }
 
@@ -143,28 +139,6 @@ int main()
     Vector3{ 0.5f, 0.5f,-0.5f},
     Vector3{ 0.5f,-0.5f, 0.5f},
     Vector3{ 0.5f, 0.5f, 0.5f}
-
-    /*
-    Vector3{ 0.0f, 0.0f, 0.0f},
-
-    Vector3{ 0.0f, 0.0f, 0.5f},
-    Vector3{ 0.0f, 0.5f, 0.0f},
-    Vector3{ 0.5f, 0.0f, 0.0f},
-    Vector3{ 0.0f, 0.0f,-0.5f},
-    Vector3{ 0.0f,-0.5f, 0.0f},
-    Vector3{-0.5f, 0.0f, 0.0f}
-    */
-
-    /*
-    Vector3{-0.5f,-0.5f, 0.0f},
-    Vector3{ 0.5f,-0.5f, 0.0f},
-    Vector3{ 0.5f, 0.5f, 0.0f},
-    Vector3{-0.5f, 0.5f, 0.0f},
-    Vector3{ 0.0f, 0.5f, 0.0f},
-    Vector3{ 0.0f,-0.5f, 0.0f},
-    Vector3{-0.5f, 0.0f, 0.0f},
-    Vector3{ 0.5f, 0.0f, 0.0f}
-    */
   };
 
   vector<Vector3> smilePointsBase =
@@ -207,12 +181,6 @@ int main()
     points[i].z *= 300;
   }
 
-    //rotateX3d(PI / 4, points);
-
-  /*
-    rotateX(PI/4,points);
-    rotateX3d(PI / 4, points);
-    */
     
   vector<Vector3> copyPoints = points;
   vector<Vector3> smilePoints = smilePointsBase;
@@ -224,10 +192,10 @@ int main()
 
   while (!WindowShouldClose()) 
   {
-
     // updating and erasing lazers
     for(int i=0;i<lazerHolder.size();++i)
     {
+			// if the laser is out of bounds and should be destroyed
       if(lazerHolder[i].timeToDestroy())
       {
         lazer frontLazer = lazerHolder[0];
@@ -249,26 +217,22 @@ int main()
 
     Vector2 currentMousePos = GetMousePosition();
 
+		// rotating the cube
     rotateX3d(((currentMousePos.y / (screenHeight /2)) - 1.0f) * angleRate * -1, points     );
     rotateY3d(((currentMousePos.x / (screenWidth  /2)) - 1.0f) * angleRate     , points     );
 
+		// rotating the front of the face
     rotateX3d(((currentMousePos.y / (screenHeight /2)) - 1.0f) * angleRate * -1, smilePoints);
     rotateY3d(((currentMousePos.x / (screenWidth  /2)) - 1.0f) * angleRate     , smilePoints);
 
-    //rotateY3d(() * angleRate, points);
-    //rotateZ3d(0.03f * angleRate, points);
 
+		// rotating the small cube based on time and if the cube is being shaken
     rotateX3d(0.06f * smallShapeRate * cos((smallShapeRate/0.2f) * PI / 2), smallShape);
     rotateY3d(0.01f * smallShapeRate * sin((smallShapeRate/0.2f) * PI / 2),smallShape);
     rotateZ3d(0.03f * smallShapeRate * sin((smallShapeRate/0.2f) * PI / 2),smallShape);
 
-    /*
-    rotateX3d(0.06f * smallShapeRate, smallShape);
-    rotateY3d(0.01f * smallShapeRate,smallShape);
-    rotateZ3d(0.03f * smallShapeRate,smallShape);
-    */
-
        
+		// starting drawing
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
@@ -286,7 +250,6 @@ int main()
 
       for(int j=0;j<points.size();++j)
       {
-        //DrawLine(points[j].x + screenWidth/2,points[j].y + screenHeight/2,points[(i + 1) % points.size()].x + screenWidth/2,points[(i + 1) % points.size()].y + screenHeight/2,Color{0,i * ((1.0f/(float)points.size()) * 255.0f),255,255});
         DrawLine(points[j].x + screenWidth/2,points[j].y + screenHeight/2,points[(i + 1) % points.size()].x + screenWidth/2,points[(i + 1) % points.size()].y + screenHeight/2,BLACK);
       }
     }
@@ -298,7 +261,6 @@ int main()
 
     for(int i=0;i<smilePoints.size();++i)
     {
-
       float circleX = smilePoints[i].x + screenWidth/2;
       float circleY = smilePoints[i].y + screenHeight/2;
       float distanceFromEye = sqrtf(pow(circleX - currentMousePos.x,2) + pow(circleY - currentMousePos.y,2));
@@ -315,98 +277,37 @@ int main()
         pupilX,
         pupilY,
         
-        //(cos((smallShapeRate/0.2f) * PI / 2) * 2) + (eyeSize - 5.0f) - 0.04f * sqrtf(pow((screenWidth/2 - currentMousePos.x),2) + pow((screenHeight/2) - currentMousePos.y,2)),
-        // try 2 
         (eyeSize - 5.0f) - (0.04f * distanceFromEye),
-        //
-        // try 1
-        // (eyeSize - 5.0f) - 0.04f * sqrtf(pow((screenWidth/2 - currentMousePos.x),2) + pow((screenHeight/2) - currentMousePos.y,2)),
         BLACK
       );
 
-      bool eyeMethod(1);
-
-      if(eyeMethod == 0)
+			float eyebrowOffset = 0.0f;
+			if(IsKeyDown(KEY_SPACE))
       {
-        // original rect
-        DrawRectangle(circleX-30.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f,BLACK);
-      }else
-      {
-        //DrawRectangle(int posX, int posY, int width, int height, Color color);
-        //DrawRectangle(circleX-30.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f,BLACK);
-
-        //Rectangle eyebrow{circleX-30.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f};
-				float eyebrowOffset = 0.0f;
-				if(IsKeyDown(KEY_SPACE))
-        {
-					eyebrowOffset = 9.0f;
-        }
-
-        Rectangle eyebrow{circleX-30.0f,circleY-(115.0f - eyebrowOffset) + (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f};
-        eyebrow.x += (eyebrow.width/2);
-        eyebrow.y += (eyebrow.height/2);
-        Vector2 eyebrowOrigin{(eyebrow.width/2),(eyebrow.height/2)};
-        //DrawRectangleRec(eyebrow,RED);
-        //DrawRectanglePro(eyebrow,eyebrowOrigin,90.0f,RED);
-
-        //float eyebrowAngle(0.0f);
-        //int directionBias(mouseDistanceX > 0 ? 1 : -1);
-        int directionBias(-1);
-
-        // if we are on the right eye
-        if(i == 1)
-        {
-          directionBias = 1;
-        }
-
-        //float eyebrowAngle(30.0f);
-        //eyebrowAngle += ((1.0f/distanceFromEye) * 100);
-        //cout << (1.0f/distanceFromEye) * 100 << endl;
-
-        /*
-        //float eyebrowAngle((80 * (mouseDistanceX / (screenWidth/2))) - (directionBias * (40 * distanceFromEye/(screenWidth/4))));
-        //eyebrowAngle += mouseDistanceY/20;
-        //eyebrowAngle *= directionBias;
-
-        //DrawRectanglePro(eyebrow,eyebrowOrigin,eyebrowAngle,BLACK);
-        //DrawRectanglePro(eyebrow,eyebrowOrigin,80.0f * (mouseDistanceX / (screenWidth/2)),BLACK);
-        
-        if(distanceFromEye < 200.0f)
-        {
-          DrawRectanglePro(eyebrow,eyebrowOrigin,80.0f * (mouseDistanceX / (screenWidth/2)),BLACK);
-        }else
-        {
-          DrawRectanglePro(eyebrow,eyebrowOrigin,30.0f * (mouseDistanceX / screenWidth),BLACK);
-        }
-        */
-
-				const float rangeThreshold  = 200.0f;
-				const float transitionRange = 100.0f;  // pixels over which we blend (200 -> 300)
-				
-				float angleNear = 80.0f * (mouseDistanceX / (screenWidth * 0.5f));
-				float angleFar  = 40.0f * (mouseDistanceX / (float)screenWidth);
-				
-				// how far past the threshold are we, normalized 0..1
-				float t = (distanceFromEye - rangeThreshold) / transitionRange;
-				if (t < 0.0f) t = 0.0f;
-				if (t > 1.0f) t = 1.0f;
-				
-				// linear interpolation between the two angles
-				float angle = angleNear + (angleFar - angleNear) * t + (IsKeyDown(KEY_SPACE) * (20.0f * (i == 0 ? -1 : 1)));
-				
-				DrawRectanglePro(eyebrow, eyebrowOrigin, angle, BLACK);
-        
-
-        //DrawRectanglePro(eyebrow,eyebrowOrigin,30.0f * (mouseDistanceX / screenWidth),BLACK);
-        //cout << distanceFromEye << endl;
-        //DrawRectanglePro(eyebrow,Vector2{eyebrow.x + (eyebrow.width/2),eyebrow.y + (eyebrow.height/2),}
-        //DrawRectanglePro(Rectangle rec, Vector2 origin, float rotation, Color color);
-
+				eyebrowOffset = 9.0f;
       }
 
+      Rectangle eyebrow{circleX-30.0f,circleY-(115.0f - eyebrowOffset) + (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f};
+      eyebrow.x += (eyebrow.width/2);
+      eyebrow.y += (eyebrow.height/2);
+      Vector2 eyebrowOrigin{(eyebrow.width/2),(eyebrow.height/2)};
 
-      //DrawLine(circleX-5.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),circleX+5.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),BLACK);
-    //rotateX3d(0.06f * smallShapeRate * cos((smallShapeRate/0.2f) * PI / 2), smallShape);
+			const float rangeThreshold  = 200.0f;
+			const float transitionRange = 100.0f;  // pixels over which we blend (200 -> 300)
+			
+			float angleNear = 80.0f * (mouseDistanceX / (screenWidth * 0.5f));
+			float angleFar  = 40.0f * (mouseDistanceX / (float)screenWidth);
+			
+			// how far past the threshold are we, normalized 0..1
+			float t = (distanceFromEye - rangeThreshold) / transitionRange;
+			if (t < 0.0f) t = 0.0f;
+			if (t > 1.0f) t = 1.0f;
+			
+			// linear interpolation between the two angles
+			float angle = angleNear + (angleFar - angleNear) * t + (IsKeyDown(KEY_SPACE) * (20.0f * (i == 0 ? -1 : 1)));
+			
+			DrawRectanglePro(eyebrow, eyebrowOrigin, angle, BLACK);
+
       if(IsKeyDown(KEY_SPACE))
       {
 
@@ -438,7 +339,6 @@ int main()
           (
 						pupilLocation,
 						lazerPoint
-            //currentMousePos
           )
         );
       }
