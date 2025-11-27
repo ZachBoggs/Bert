@@ -323,10 +323,8 @@ int main()
 				// calculating the pupil position
         Vector2 pupilLocation
         {
-					pupilX + (10 * ((currentMousePos.x / pupilX) - 1.0f)) + (3 * cos((smallShapeRate / 0.2f) * PI / 2)),
-					pupilY + (10 * ((currentMousePos.y / pupilY) - 1.0f)) + (3 * cos((smallShapeRate / 0.2f) * PI / 2))
-					//pupilX,
-					//pupilY
+					pupilX,
+					pupilY
         };
 
 
