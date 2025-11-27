@@ -73,13 +73,13 @@ void rotateX(const float& angle, vector<Vector3>& points)
 }
 
 
-class lazer
+class laser
 {
   Vector2 originPoint;
   Vector2 scaleFactor;
   float acceleration;
 
-  // points on the lazer
+  // points on the laser
   Vector2 backEnd;
   Vector2 frontEnd;
   float direction;
@@ -87,7 +87,7 @@ class lazer
 
   public:
 
-  lazer(const Vector2& origin,const Vector2& target) : 
+  laser(const Vector2& origin,const Vector2& target) : 
     acceleration(0.04f),
     originPoint(origin),
     scaleFactor(Vector2{target.x - origin.x,target.y - origin.y}),
@@ -98,7 +98,7 @@ class lazer
 
   bool timeToDestroy()
   {
-    // checking if the lazer is out of bounds, if so then we return true
+    // checking if the laser is out of bounds, if so then we return true
     if(backEnd.x  > screenWidth  || backEnd.x  <= 0) { return true; }
     if(backEnd.y  > screenHeight || backEnd.y  <= 0) { return true; }
     return false;
@@ -115,7 +115,7 @@ class lazer
     frontEnd.y += acceleration * scaleFactor.y;
   }
 
-  void drawLazer()
+  void drawLaser()
   {
     DrawLineV(backEnd,frontEnd,RED);
   }
@@ -188,25 +188,25 @@ int main()
   float smallShapeRate = 0.20f;
   float eyeSize = 42.0f;
 
-  vector<lazer> lazerHolder;
+  vector<laser> laserHolder;
 
   while (!WindowShouldClose()) 
   {
-    // updating and erasing lazers
-    for(int i=0;i<lazerHolder.size();++i)
+    // updating and erasing lasers
+    for(int i=0;i<laserHolder.size();++i)
     {
 			// if the laser is out of bounds and should be destroyed
-      if(lazerHolder[i].timeToDestroy())
+      if(laserHolder[i].timeToDestroy())
       {
-        lazer frontLazer = lazerHolder[0];
-        lazerHolder[0] = lazerHolder[i];
-        lazerHolder[i] = frontLazer;
+        laser frontLaser = laserHolder[0];
+        laserHolder[0] = laserHolder[i];
+        laserHolder[i] = frontLaser;
 
-        lazerHolder.erase(lazerHolder.begin());
+        laserHolder.erase(laserHolder.begin());
         i--;
         continue;
       }
-      lazerHolder[i].updatePosition();
+      laserHolder[i].updatePosition();
     }
 
 
@@ -317,28 +317,28 @@ int main()
 					pupilY + (10 * ((currentMousePos.y / pupilY) - 1.0f)) + (3 * cos((smallShapeRate / 0.2f) * PI / 2))
         };
 
-				Vector2 lazerDirection
+				Vector2 laserDirection
 				{
 					currentMousePos.x - pupilLocation.x,
 					currentMousePos.y - pupilLocation.y
 				};
 
-				float currentLength = sqrt((lazerDirection.x * lazerDirection.x) + (lazerDirection.y * lazerDirection.y));
+				float currentLength = sqrt((laserDirection.x * laserDirection.x) + (laserDirection.y * laserDirection.y));
 
-				lazerDirection.x /= currentLength;
-				lazerDirection.y /= currentLength;
+				laserDirection.x /= currentLength;
+				laserDirection.y /= currentLength;
 
-				float lazerLength = 50 + abs(cos(smallShapeRate) * 40);
+				float laserLength = 50 + abs(cos(smallShapeRate) * 40);
 
-				Vector2 lazerPoint{(lazerDirection.x * lazerLength) + pupilLocation.x, (lazerDirection.y * lazerLength) + pupilLocation.y};
+				Vector2 laserPoint{(laserDirection.x * laserLength) + pupilLocation.x, (laserDirection.y * laserLength) + pupilLocation.y};
 
-        // pushing back a lazer for both eyes
-        lazerHolder.push_back
+        // pushing back a laser for both eyes
+        laserHolder.push_back
         (
-          lazer
+          laser
           (
 						pupilLocation,
-						lazerPoint
+						laserPoint
           )
         );
       }
@@ -360,9 +360,9 @@ int main()
       }
     }
 
-    for(int i=0;i<lazerHolder.size();++i)
+    for(int i=0;i<laserHolder.size();++i)
     {
-      lazerHolder[i].drawLazer();
+      laserHolder[i].drawLaser();
     }
 
     EndDrawing();
