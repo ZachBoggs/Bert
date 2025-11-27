@@ -166,7 +166,7 @@ int main()
     Vector3{ 0.5f, 0.5f, 0.5f}
   };
 
-	// scaling the shape
+  // scaling the shape
   for(int i=0;i<smallShape.size();++i)
   {
     smallShape[i].x *= 100;
@@ -174,7 +174,7 @@ int main()
     smallShape[i].z *= 100;
   }
 
-	// scaling the cube
+  // scaling the cube
   for(int i=0;i<points.size();++i)
   {
     points[i].x *= 300;
@@ -196,7 +196,7 @@ int main()
     // updating and erasing lasers
     for(int i=0;i<laserHolder.size();++i)
     {
-			// if the laser is out of bounds and should be destroyed
+      // if the laser is out of bounds and should be destroyed
       if(laserHolder[i].timeToDestroy())
       {
         laser frontLaser = laserHolder[0];
@@ -218,22 +218,22 @@ int main()
 
     Vector2 currentMousePos = GetMousePosition();
 
-		// rotating the cube
+    // rotating the cube
     rotateX3d(((currentMousePos.y / (screenHeight /2)) - 1.0f) * angleRate * -1, points     );
     rotateY3d(((currentMousePos.x / (screenWidth  /2)) - 1.0f) * angleRate     , points     );
 
-		// rotating the front of the face
+    // rotating the front of the face
     rotateX3d(((currentMousePos.y / (screenHeight /2)) - 1.0f) * angleRate * -1, smilePoints);
     rotateY3d(((currentMousePos.x / (screenWidth  /2)) - 1.0f) * angleRate     , smilePoints);
 
 
-		// rotating the small cube based on time and if the cube is being shaken
+    // rotating the small cube based on time and if the cube is being shaken
     rotateX3d(0.06f * smallShapeRate * cos((smallShapeRate/0.2f) * PI / 2), smallShape);
     rotateY3d(0.01f * smallShapeRate * sin((smallShapeRate/0.2f) * PI / 2),smallShape);
     rotateZ3d(0.03f * smallShapeRate * sin((smallShapeRate/0.2f) * PI / 2),smallShape);
 
        
-		// starting drawing
+    // starting drawing
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
@@ -244,12 +244,12 @@ int main()
     string nameText = "Bert";
     DrawText(nameText.c_str(),screenWidth/2 - MeasureText(nameText.c_str(),50)/2,40,50,BLACK);
 
-		// drawing the corners to the cube
+    // drawing the corners to the cube
     for(int i=0;i<points.size();++i)
     {
       DrawCircle(points[i].x + screenWidth/2,points[i].y + screenHeight/2,3.0f,RED);
 
-			// drawing lines from this corner to the other corners
+      // drawing lines from this corner to the other corners
       for(int j=0;j<points.size();++j)
       {
         DrawLine(points[j].x + screenWidth/2,points[j].y + screenHeight/2,points[(i + 1) % points.size()].x + screenWidth/2,points[(i + 1) % points.size()].y + screenHeight/2,BLACK);
@@ -263,7 +263,7 @@ int main()
 
     for(int i=0;i<smilePoints.size();++i)
     {
-			// calculating our key variables that we will use
+      // calculating our key variables that we will use
       float circleX = smilePoints[i].x + screenWidth/2;
       float circleY = smilePoints[i].y + screenHeight/2;
       float distanceFromEye = sqrtf(pow(circleX - currentMousePos.x,2) + pow(circleY - currentMousePos.y,2));
@@ -273,7 +273,7 @@ int main()
       float mouseDistanceX = currentMousePos.x - pupilX;
       float mouseDistanceY = currentMousePos.y - pupilY;
 
-			// drawing the current eye with an outline
+      // drawing the current eye with an outline
       DrawCircle(circleX,circleY,eyeSize,GRAY);
       DrawCircle(circleX,circleY,eyeSize - 2.0f,WHITE);
       DrawCircle
@@ -285,89 +285,89 @@ int main()
         BLACK
       );
 
-			float eyebrowOffset = 0.0f;
-			if(IsKeyDown(KEY_SPACE))
+      float eyebrowOffset = 0.0f;
+      if(IsKeyDown(KEY_SPACE))
       {
-				eyebrowOffset = 9.0f;
+        eyebrowOffset = 9.0f;
       }
 
 
-			//// making an eyebrow for each eye and setting the angle of it based on distance from the cursor
-			//
+      //// making an eyebrow for each eye and setting the angle of it based on distance from the cursor
+      //
       Rectangle eyebrow{circleX-30.0f,circleY-(115.0f - eyebrowOffset) + (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f};
       eyebrow.x += (eyebrow.width/2);
       eyebrow.y += (eyebrow.height/2);
       Vector2 eyebrowOrigin{(eyebrow.width/2),(eyebrow.height/2)};
 
-			const float rangeThreshold  = 200.0f;
-			const float transitionRange = 100.0f;  // pixels over which we blend (200 -> 300)
-			
-			float angleNear = 80.0f * (mouseDistanceX / (screenWidth * 0.5f));
-			float angleFar  = 40.0f * (mouseDistanceX / (float)screenWidth);
-			
-			// how far past the threshold are we, normalized 0..1
-			float t = (distanceFromEye - rangeThreshold) / transitionRange;
-			if (t < 0.0f) t = 0.0f;
-			if (t > 1.0f) t = 1.0f;
-			
-			// linear interpolation between the two angles
-			float angle = angleNear + (angleFar - angleNear) * t + (IsKeyDown(KEY_SPACE) * (20.0f * (i == 0 ? -1 : 1)));
-			
-			DrawRectanglePro(eyebrow, eyebrowOrigin, angle, BLACK);
-			//
-			////
+      const float rangeThreshold  = 200.0f;
+      const float transitionRange = 100.0f;  // pixels over which we blend (200 -> 300)
+      
+      float angleNear = 80.0f * (mouseDistanceX / (screenWidth * 0.5f));
+      float angleFar  = 40.0f * (mouseDistanceX / (float)screenWidth);
+      
+      // how far past the threshold are we, normalized 0..1
+      float t = (distanceFromEye - rangeThreshold) / transitionRange;
+      if (t < 0.0f) t = 0.0f;
+      if (t > 1.0f) t = 1.0f;
+      
+      // linear interpolation between the two angles
+      float angle = angleNear + (angleFar - angleNear) * t + (IsKeyDown(KEY_SPACE) * (20.0f * (i == 0 ? -1 : 1)));
+      
+      DrawRectanglePro(eyebrow, eyebrowOrigin, angle, BLACK);
+      //
+      ////
 
 
       if(IsKeyDown(KEY_SPACE))
       {
-				// calculating the pupil position
+        // calculating the pupil position
         Vector2 pupilLocation
         {
-					pupilX,
-					pupilY
+          pupilX,
+          pupilY
         };
 
 
-				//// getting the normalized direction from the pupil to the mouse
-				//
-				Vector2 laserDirection
-				{
-					currentMousePos.x - pupilLocation.x,
-					currentMousePos.y - pupilLocation.y
-				};
+        //// getting the normalized direction from the pupil to the mouse
+        //
+        Vector2 laserDirection
+        {
+          currentMousePos.x - pupilLocation.x,
+          currentMousePos.y - pupilLocation.y
+        };
 
-				float currentLength = sqrt((laserDirection.x * laserDirection.x) + (laserDirection.y * laserDirection.y));
+        float currentLength = sqrt((laserDirection.x * laserDirection.x) + (laserDirection.y * laserDirection.y));
 
-				laserDirection.x /= currentLength;
-				laserDirection.y /= currentLength;
-				//
-				////
+        laserDirection.x /= currentLength;
+        laserDirection.y /= currentLength;
+        //
+        ////
 
 
-				float laserLength = 50 + abs(cos(smallShapeRate) * 40);
+        float laserLength = 50 + abs(cos(smallShapeRate) * 40);
 
-				Vector2 laserPoint{(laserDirection.x * laserLength) + pupilLocation.x, (laserDirection.y * laserLength) + pupilLocation.y};
+        Vector2 laserPoint{(laserDirection.x * laserLength) + pupilLocation.x, (laserDirection.y * laserLength) + pupilLocation.y};
 
         // pushing back a laser for both eyes
         laserHolder.push_back
         (
           laser
           (
-						pupilLocation,
-						laserPoint
+            pupilLocation,
+            laserPoint
           )
         );
       }
     }
 
 
-		// drawing lines from the cube to the small cube
+    // drawing lines from the cube to the small cube
     for(int i=0;i<points.size();++i)
     {
       DrawLine(points[i].x + screenWidth/2,points[i].y + screenHeight/2,smallShape[i].x + currentMousePos.x,smallShape[i].y + currentMousePos.y,RED);
     }
 
-		// drawing the eyes
+    // drawing the eyes
     for(int i=0;i<smallShape.size();++i)
     {
       DrawCircle(smallShape[i].x + currentMousePos.x,smallShape[i].y + currentMousePos.y,3.0f,RED);
@@ -378,7 +378,7 @@ int main()
       }
     }
 
-		// drawing our lasers
+    // drawing our lasers
     for(int i=0;i<laserHolder.size();++i)
     {
       laserHolder[i].drawLaser();
