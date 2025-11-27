@@ -305,34 +305,140 @@ int main()
       float pupilX = circleX + (20 * ((currentMousePos.x / circleX) - 1.0f)) + (5 * cos((smallShapeRate / 0.2f)));
       float pupilY = circleY + (20 * ((currentMousePos.y / circleY) - 1.0f)) + (5 * sin((smallShapeRate / 0.2f)));
 
+      float mouseDistanceX = currentMousePos.x - pupilX;
+      float mouseDistanceY = currentMousePos.y - pupilY;
+
       DrawCircle(circleX,circleY,eyeSize,GRAY);
       DrawCircle(circleX,circleY,eyeSize - 2.0f,WHITE);
       DrawCircle
       (
         pupilX,
         pupilY,
+        
         //(cos((smallShapeRate/0.2f) * PI / 2) * 2) + (eyeSize - 5.0f) - 0.04f * sqrtf(pow((screenWidth/2 - currentMousePos.x),2) + pow((screenHeight/2) - currentMousePos.y,2)),
+        // try 2 
         (eyeSize - 5.0f) - (0.04f * distanceFromEye),
-        //(eyeSize - 5.0f) - 0.04f * sqrtf(pow((screenWidth/2 - currentMousePos.x),2) + pow((screenHeight/2) - currentMousePos.y,2)),
+        //
+        // try 1
+        // (eyeSize - 5.0f) - 0.04f * sqrtf(pow((screenWidth/2 - currentMousePos.x),2) + pow((screenHeight/2) - currentMousePos.y,2)),
         BLACK
       );
 
-      DrawRectangle(circleX-30.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f,BLACK);
-      DrawLine(circleX-5.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),circleX+5.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),BLACK);
+      bool eyeMethod(1);
+
+      if(eyeMethod == 0)
+      {
+        // original rect
+        DrawRectangle(circleX-30.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f,BLACK);
+      }else
+      {
+        //DrawRectangle(int posX, int posY, int width, int height, Color color);
+        //DrawRectangle(circleX-30.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f,BLACK);
+
+        //Rectangle eyebrow{circleX-30.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f};
+				float eyebrowOffset = 0.0f;
+				if(IsKeyDown(KEY_SPACE))
+        {
+					eyebrowOffset = 9.0f;
+        }
+
+        Rectangle eyebrow{circleX-30.0f,circleY-(115.0f - eyebrowOffset) + (10 * (7 - (distanceFromEye/100.0f))),60.0f,10.0f};
+        eyebrow.x += (eyebrow.width/2);
+        eyebrow.y += (eyebrow.height/2);
+        Vector2 eyebrowOrigin{(eyebrow.width/2),(eyebrow.height/2)};
+        //DrawRectangleRec(eyebrow,RED);
+        //DrawRectanglePro(eyebrow,eyebrowOrigin,90.0f,RED);
+
+        //float eyebrowAngle(0.0f);
+        //int directionBias(mouseDistanceX > 0 ? 1 : -1);
+        int directionBias(-1);
+
+        // if we are on the right eye
+        if(i == 1)
+        {
+          directionBias = 1;
+        }
+
+        //float eyebrowAngle(30.0f);
+        //eyebrowAngle += ((1.0f/distanceFromEye) * 100);
+        //cout << (1.0f/distanceFromEye) * 100 << endl;
+
+        /*
+        //float eyebrowAngle((80 * (mouseDistanceX / (screenWidth/2))) - (directionBias * (40 * distanceFromEye/(screenWidth/4))));
+        //eyebrowAngle += mouseDistanceY/20;
+        //eyebrowAngle *= directionBias;
+
+        //DrawRectanglePro(eyebrow,eyebrowOrigin,eyebrowAngle,BLACK);
+        //DrawRectanglePro(eyebrow,eyebrowOrigin,80.0f * (mouseDistanceX / (screenWidth/2)),BLACK);
+        
+        if(distanceFromEye < 200.0f)
+        {
+          DrawRectanglePro(eyebrow,eyebrowOrigin,80.0f * (mouseDistanceX / (screenWidth/2)),BLACK);
+        }else
+        {
+          DrawRectanglePro(eyebrow,eyebrowOrigin,30.0f * (mouseDistanceX / screenWidth),BLACK);
+        }
+        */
+
+				const float rangeThreshold  = 200.0f;
+				const float transitionRange = 100.0f;  // pixels over which we blend (200 -> 300)
+				
+				float angleNear = 80.0f * (mouseDistanceX / (screenWidth * 0.5f));
+				float angleFar  = 40.0f * (mouseDistanceX / (float)screenWidth);
+				
+				// how far past the threshold are we, normalized 0..1
+				float t = (distanceFromEye - rangeThreshold) / transitionRange;
+				if (t < 0.0f) t = 0.0f;
+				if (t > 1.0f) t = 1.0f;
+				
+				// linear interpolation between the two angles
+				float angle = angleNear + (angleFar - angleNear) * t + (IsKeyDown(KEY_SPACE) * (20.0f * (i == 0 ? -1 : 1)));
+				
+				DrawRectanglePro(eyebrow, eyebrowOrigin, angle, BLACK);
+        
+
+        //DrawRectanglePro(eyebrow,eyebrowOrigin,30.0f * (mouseDistanceX / screenWidth),BLACK);
+        //cout << distanceFromEye << endl;
+        //DrawRectanglePro(eyebrow,Vector2{eyebrow.x + (eyebrow.width/2),eyebrow.y + (eyebrow.height/2),}
+        //DrawRectanglePro(Rectangle rec, Vector2 origin, float rotation, Color color);
+
+      }
+
+
+      //DrawLine(circleX-5.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),circleX+5.0f,circleY-60.0f - (10 * (7 - (distanceFromEye/100.0f))),BLACK);
     //rotateX3d(0.06f * smallShapeRate * cos((smallShapeRate/0.2f) * PI / 2), smallShape);
       if(IsKeyDown(KEY_SPACE))
       {
-        // pusing back a lazer for both eyes
+
+        Vector2 pupilLocation
+        {
+					pupilX + (10 * ((currentMousePos.x / pupilX) - 1.0f)) + (3 * cos((smallShapeRate / 0.2f) * PI / 2)),
+					pupilY + (10 * ((currentMousePos.y / pupilY) - 1.0f)) + (3 * cos((smallShapeRate / 0.2f) * PI / 2))
+        };
+
+				Vector2 lazerDirection
+				{
+					currentMousePos.x - pupilLocation.x,
+					currentMousePos.y - pupilLocation.y
+				};
+
+				float currentLength = sqrt((lazerDirection.x * lazerDirection.x) + (lazerDirection.y * lazerDirection.y));
+
+				lazerDirection.x /= currentLength;
+				lazerDirection.y /= currentLength;
+
+				float lazerLength = 50 + abs(cos(smallShapeRate) * 40);
+
+				Vector2 lazerPoint{(lazerDirection.x * lazerLength) + pupilLocation.x, (lazerDirection.y * lazerLength) + pupilLocation.y};
+
+        // pushing back a lazer for both eyes
         lazerHolder.push_back
         (
           lazer
           (
-            Vector2
-            {
-              pupilX + (10 * ((currentMousePos.x / pupilX) - 1.0f)) + (3 * cos((smallShapeRate / 0.2f) * PI / 2)),
-              pupilY + (10 * ((currentMousePos.y / pupilY) - 1.0f)) + (3 * cos((smallShapeRate / 0.2f) * PI / 2))
-            },
-            currentMousePos
+						pupilLocation,
+						lazerPoint
+            //currentMousePos
           )
         );
       }
